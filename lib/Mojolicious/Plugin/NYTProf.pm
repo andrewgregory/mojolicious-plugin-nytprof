@@ -338,7 +338,9 @@ sub _profiles {
     my $pid = $1;
 
     my ($nytprof,$duration);
-    eval { $nytprof = Devel::NYTProf::Data->new({filename => $filepath}); };
+    eval {
+        $nytprof = Devel::NYTProf::Data->new({filename => $filepath,quiet => 1});
+    };
 
     $profile->{duration} = $nytprof
       ? sprintf('%.4f secs', $nytprof->attributes->{profiler_duration})
