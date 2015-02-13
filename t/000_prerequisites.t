@@ -6,16 +6,12 @@ use warnings;
 use Test::More;
 
 use File::Find;
+use File::Spec::Functions qw/catfile catdir splitpath catpath/;
 use File::Which;
 
-my $nytprofhtml_path = File::Which::which('nytprofhtml');
+require Mojolicious::Plugin::NYTProf;
 
-if ( ! $nytprofhtml_path ) {
-  # last ditch attempt to find nytprofhtml, assume in same dir as perl
-  $nytprofhtml_path = $^X;
-  $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
-}
-
+my $nytprofhtml_path = Mojolicious::Plugin::NYTProf::_find_bin('nytprofhtml');
 BAIL_OUT( "Couldn't find nytprofhtml in PATH or in same location as $^X" )
 	if ! -e $nytprofhtml_path;
 

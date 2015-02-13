@@ -57,7 +57,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Time::HiRes 'gettimeofday';
 use File::Temp;
 use File::Which;
-use File::Spec::Functions qw/catfile catdir/;
+use File::Spec::Functions qw/catfile catdir splitpath/;
 
 our $VERSION = '0.13';
 
@@ -144,25 +144,8 @@ sub register {
 
     return if $app->mode eq 'production' and ! $nytprof->{allow_production};
 
-    my $nytprofhtml_path;
-
-    if ( $nytprofhtml_path = $nytprof->{nytprofhtml_path} ) {
-      # no sanity checking here, if a path is configured we use it
-      # and don't fall through to defaults
-    } else {
-
-      # fall back, assume nytprofhtml_path in same dir as perl
-      $nytprofhtml_path = $^X;
-      $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
-
-      if ( ! -e $nytprofhtml_path ) {
-        # last ditch attempt to find nytprofhtml, use File::Which
-        # (last ditch in that it may return a different nytprofhtml
-        # that is using a differently configured perl, e.g. system,
-        # this may die with incompat config errorrs but at least try)
-        $nytprofhtml_path = File::Which::which('nytprofhtml');
-      }
-    }
+    my $nytprofhtml_path
+      = $nytprof->{nytprofhtml_path} || _find_bin('nytprofhtml');
 
     -e $nytprofhtml_path
       or die "Could not find nytprofhtml script.  Ensure it's in your path, "
@@ -205,6 +188,24 @@ sub register {
 
     $self->_add_hooks($app, $config, $nytprofhtml_path);
   }
+}
+
+sub _find_bin {
+  my ($prog) = @_;
+
+  require Config;
+
+  # check configured executable directories
+  foreach my $dir (@Config::Config{qw(sitebin vendorbin bin)}) {
+    my $path = catfile($dir,$prog);
+    -e $path and return $path;
+  }
+
+  # last ditch attempt to find $prog, use File::Which
+  # (last ditch in that it may return a different $prog
+  # that is using a differently configured perl, e.g. system,
+  # this may die with incompat config errors but at least try)
+  return File::Which::which($prog);
 }
 
 sub _sanitize_env_val {
