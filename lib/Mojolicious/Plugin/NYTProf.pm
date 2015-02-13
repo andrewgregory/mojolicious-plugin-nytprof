@@ -289,10 +289,10 @@ sub _list_profiles {
     : '<p>No profiles found</p>';
 
   foreach (@profiles) {
+    my $link = $self->link_to($_->{label},$_->{url});
     $list .= qq{
       <li>
-        <a href="$_->{url}">$_->{label}</a>
-          (PID $_->{pid}, $_->{created}, $_->{duration})
+        $link (PID $_->{pid}, $_->{created}, $_->{duration})
       </li>
     };
   }
