@@ -21,13 +21,14 @@ unlink(catfile($prof_dir,"nytprof.trace"));
 
 {
   use Mojolicious::Lite;
+  use Mojolicious::Plugin::NYTProf;
 
   plugin NYTProf => {
     nytprof => {
       profiles_dir => $prof_dir,
       env => {
         trace => 1,
-        log => "$prof_dir/nytprof.trace",
+        log => Mojolicious::Plugin::NYTProf::_sanitize_env_val("$prof_dir/nytprof.trace"),
       }
     },
   };

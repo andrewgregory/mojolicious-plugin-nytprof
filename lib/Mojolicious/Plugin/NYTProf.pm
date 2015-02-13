@@ -192,7 +192,7 @@ sub register {
       # options for Devel::NYTProf - any can be passed but will always set
       # the start and file options here
       $nytprof->{env}{start} = 'no';
-      $nytprof->{env}{file}  = $file;
+      $nytprof->{env}{file}  = _sanitize_env_val($file);
 
       $ENV{NYTPROF} = join( ':',
         map { "$_=" . $nytprof->{env}{$_} }
@@ -205,6 +205,13 @@ sub register {
 
     $self->_add_hooks($app, $config, $nytprofhtml_path);
   }
+}
+
+sub _sanitize_env_val {
+  my ($val) = @_;
+  $val =~ s/\\/\\\\/g;
+  $val =~ s/:/\\:/g;
+  return $val;
 }
 
 sub _add_hooks {
