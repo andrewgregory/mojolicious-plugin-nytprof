@@ -32,7 +32,7 @@ my $t = Test::Mojo->new;
 
 $t->get_ok('/some_static_file')
   ->status_is(200)
-  ->content_is("well hello there!\n");
+  ->content_like(qr/^well hello there!\r?\n$/);
 
 ok(
 	! Mojolicious::Plugin::NYTProf::_profiles(catfile($prof_dir,'profiles')),
