@@ -11,7 +11,7 @@ use File::Spec::Functions 'catfile';
 use FindBin '$Bin';
 use File::Path qw'rmtree';
 
-my $prof_dir = catfile($Bin,"nytprof");
+my $prof_dir = catfile( $Bin, "nytprof" );
 
 my @existing_profs = glob "$prof_dir/profiles/nytprof*";
 unlink $_ for @existing_profs;
@@ -25,25 +25,24 @@ rmtree($_) for @existing_runs;
 
   plugin NYTProf => {
     nytprof => {
-      profiles_dir => $prof_dir,
+      profiles_dir     => $prof_dir,
+      allow_production => 1,
     },
   };
 
   any 'some_route' => sub {
     my ($self) = @_;
-    $self->render(text => "basic stuff\n");
+    $self->render( text => "basic stuff\n" );
   };
 }
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/some_route')
-  ->status_is(200)
-  ->content_is("basic stuff\n");
+$t->get_ok('/some_route')->status_is(200)->content_is("basic stuff\n");
 
 ok(
-  ! Mojolicious::Plugin::NYTProf::_profiles(catfile($prof_dir,'profiles')),
-  'no profiles generated when in production mode'
+  Mojolicious::Plugin::NYTProf::_profiles( catfile( $prof_dir, 'profiles' ) ),
+  'profiles generated when in production mode with allow_production config'
 );
 
 done_testing();
