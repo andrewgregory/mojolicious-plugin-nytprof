@@ -35,6 +35,7 @@ unlink(catfile($prof_dir,"nytprof.trace"));
 
   any 'some_route' => sub {
     my ($self) = @_;
+    sleep 1 if $^O eq 'MSWin32';
     $self->render(text => "basic stuff\n");
   };
 }
